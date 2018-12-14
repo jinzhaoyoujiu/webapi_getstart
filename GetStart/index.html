@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>products</title>
+</head>
+<body>
+    <div>
+        <ul id="products"></ul>
+        <div>
+        <span><input id="productId" value="1" /></span>  
+        <button id="one">显示产品名称</button></div>
+        <div>
+            <span id="productName"></span>
+        </div>
+    </div>
+
+    <script src="Scripts/jquery-3.3.1.min.js"></script>
+    <script>
+        var url = "api/products";
+        $(document).ready(showProducts);
+        function showProducts() {
+            $.getJSON(url +"/GetAllProducts").done(function (data) {
+                $.each(data, function (key, item) {
+                    $('<li>', { text: formatter(item) }).appendTo($('#products'));
+                });
+            });
+        }
+        function formatter(item) {
+            return item.name + ';$:' + item.price;
+        }
+        document.getElementById('one').addEventListener('click', showProduct, false);
+        function showProduct() {
+            var id = document.getElementById('productId').value;
+            $.getJSON(url + '/GetProduct/' + id).done(function (data) {
+                document.getElementById('productName').innerHTML = data.name;
+            }).fail(function (jqXHR, textStatus, err) {
+                document.getElementById('productName').innerHTML ='Error: '+ err;
+                });
+            document.getElementById('one').removeEventListener('click', showProduct,false);
+        }
+        testVoid();
+        function testVoid() {
+            $.getJSON(url + '/TestVoid').done(function (data) { console.log('voidData:', data); })
+                .fail(function (jqXHR, textStatus, err) { console.log('voidErr:', err); });
+            //$.getJSON(url + '/TestResponseMessage')
+            //    .done(function (data) { console.log('responseMessage:', data); })
+            //    .fail(function (jqXHR, textStatus, err) { console.log('responseMessageErr:' + err); });
+            $.ajax({
+                url: url + '/TestResponseMessage',
+                success: function (result) {
+                    console.log(result);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
